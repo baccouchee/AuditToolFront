@@ -1,5 +1,19 @@
-import React from 'react'
-import { Grid, Paper, Avatar, TextField, Button, Typography, InputBase, CssBaseline } from '@mui/material'
+import React, { useState } from 'react'
+import {
+  Grid,
+  Paper,
+  Button,
+  InputBase,
+  CssBaseline,
+  Alert,
+  Collapse,
+  Autocomplete,
+  TextField,
+  InputAdornment,
+  FilledInput,
+  InputLabel,
+  FormControl,
+} from '@mui/material'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import IconButton from '@mui/material/IconButton'
@@ -9,7 +23,9 @@ import Box from '@mui/material/Box'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import Ey from './img/Ey.png'
 import axios from 'axios'
-import { BrowserRouter, Route, Link } from 'react-router-dom'
+import CloseIcon from '@mui/icons-material/Close'
+import { useNavigate } from 'react-router-dom'
+import { useMutation, useQuery } from 'react-query'
 
 const Login = () => {
   const paperStyle = {
@@ -21,17 +37,12 @@ const Login = () => {
   }
   const styles = {
     multilineColor: {
-      color: 'grey',
+      color: 'black',
     },
 
     inputBase: {
-      border: '1px solid white',
       borderRadius: '7px',
-      height: '6vh',
       backgroundColor: '#F6F6FA',
-      padding: 10,
-      margin: 'normal',
-      width: '45vh',
     },
 
     imagebackgound: {
@@ -51,11 +62,11 @@ const Login = () => {
     weight: '',
     weightRange: '',
     showPassword: false,
+    email: '',
   })
 
-  const handleChange = prop => event => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleClickShowPassword = () => {
     setValues({
@@ -68,65 +79,140 @@ const Login = () => {
     event.preventDefault()
   }
 
-  return (
-    <Grid container component="main" style={styles.imagebackgound}>
-      <CssBaseline />
-      <Paper elevation={10} style={paperStyle}>
-        <Box>
-          <Grid align="center">
-            <img src="./white.png" style={avatarStyle} />
-            <Box sx={{ height: '4ch' }} />
-            <h2 className="font-face" style={{ color: 'white' }}>
-              Sign In
-            </h2>
-          </Grid>
-          <Box textAlign="center">
-            <Box sx={{ height: '4ch' }} />
-            <InputBase label="Username" placeholder="Enter username" style={styles.inputBase} fullWidth required />
-            <Box sx={{ height: '2ch' }} />
-            <InputBase
-              style={styles.inputBase}
-              placeholder="Enter password"
-              type={values.showPassword ? 'text' : 'password'}
-              value={values.password}
-              onChange={handleChange('password')}
-              endAdornment={
-                <IconButton
-                  aria-label="toggle password visibility"
-                  style={styles.multilineColor}
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="start"
-                >
-                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              }
-              fullWidth
-              required
-            />
-            <Box sx={{ height: '2ch' }} />
+  const navigate = useNavigate()
 
-            <FormControlLabel
-              control={<Checkbox name="checkedB" sx={{ color: '#F6F6FA' }} />}
-              sx={{ color: 'white' }}
-              label="Remember me"
-            />
+  const queryKey = ['users']
+
+  const { isLoading, mutate } = useMutation(
+    queryKey,
+    async loginData => {
+      const resp = await axios.post('users/login', loginData)
+      return resp.data
+    },
+    {
+      onSuccess: async data => {
+        localStorage.setItem('thisismynewcourse', data.token)
+
+        if (data.user.roles == 'junior') {
+          navigate('/projects')
+        } else navigate('/clients')
+      },
+      onError: async error => {
+        console.log(error)
+        setOpen(true)
+      },
+    },
+  )
+
+  const handleChange = prop => event => {
+    setValues({ ...values, [prop]: event.target.value })
+  }
+  const handleSubmitLogin = async e => {
+    e.preventDefault()
+
+    const loginData = {
+      email,
+      password,
+    }
+
+    mutate(loginData)
+  }
+
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <CssBaseline />
+      <Grid container component="main" style={styles.imagebackgound}>
+        <Paper elevation={10} style={paperStyle}>
+          <Box>
+            <Grid align="center">
+              <Collapse in={open} sx={{ width: '50%', marginTop: '5%' }}>
+                <Alert
+                  severity="error"
+                  action={
+                    <IconButton
+                      aria-label="close"
+                      color="inherit"
+                      size="small"
+                      onClick={() => {
+                        setOpen(false)
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  }
+                  sx={{ mb: 2 }}
+                >
+                  The email or password are incorrect !
+                </Alert>
+              </Collapse>
+              <img src="./white.png" style={avatarStyle} />
+              <Box sx={{ height: '4ch' }} />
+
+              <h2 className="font-face" style={{ color: 'white' }}>
+                Sign In
+              </h2>
+            </Grid>
+            <Box textAlign="center">
+              <Box sx={{ height: '4ch' }} />
+
+              <TextField
+                label="Email"
+                sx={{ width: '35ch' }}
+                placeholder="Enter email"
+                variant="filled"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                style={styles.inputBase}
+              />
+
+              <Box sx={{ height: '2ch' }} />
+              <FormControl sx={{ width: '35ch' }} variant="filled">
+                <InputLabel htmlFor="filled-adornment-password">Password</InputLabel>
+                <FilledInput
+                  id="filled-adornment-password"
+                  type={values.showPassword ? 'text' : 'password'}
+                  value={password}
+                  style={styles.inputBase}
+                  onChange={e => setPassword(e.target.value)}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <Box sx={{ height: '2ch' }} />
+              <FormControlLabel
+                control={<Checkbox name="checkedB" sx={{ color: '#F6F6FA' }} />}
+                sx={{ color: 'white' }}
+                label="Remember me"
+              />
+            </Box>
+            <Box textAlign="center">
+              <Button
+                variant="contained"
+                type="submit"
+                onClick={handleSubmitLogin}
+                style={btnstyle}
+                endIcon={<ArrowForwardIosIcon />}
+              >
+                Sign in
+              </Button>
+            </Box>
           </Box>
-          <Box textAlign="center">
-            <Button
-              component={Link}
-              to="/clients"
-              variant="contained"
-              type="submit"
-              style={btnstyle}
-              endIcon={<ArrowForwardIosIcon />}
-            >
-              Sign in
-            </Button>
-          </Box>
-        </Box>
-      </Paper>
-    </Grid>
+        </Paper>
+      </Grid>
+    </Box>
   )
 }
 

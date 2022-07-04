@@ -1,17 +1,17 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './Login'
+import ActivateProject from './pages/ActivateProject'
 import Clients from './pages/Clients'
 import Projects from './pages/Projects'
 
-function App() {
+const App = () => {
   return (
-    <div>
-      <Routes>
-        <Route path="/clients" element={<Clients />}></Route>
-        <Route path="/projects" element={<Projects />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />}></Route>
+      <Route path="/clients" element={<Clients />}></Route>
+      <Route path="/projects" element={<Projects />}></Route>
+      <Route path="/activate" element={<ActivateProject />}></Route>
+    </Routes>
   )
 }
 

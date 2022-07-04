@@ -14,98 +14,178 @@ import {
   CardActions,
   Avatar,
 } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import DrawerPerm from '../Components/Drawer/DrawerPerm'
+import { useNavigate } from 'react-router-dom'
+import { useQuery } from 'react-query'
+import axios from 'axios'
+import { Buffer } from 'buffer'
 
 const Projects = () => {
-  const btnstyle = { margin: '30px', width: '25vh', height: '6vh', backgroundColor: '#FFE600', color: '#1A1A24' }
-  const btnstyle1 = { backgroundColor: '#1A1A24', color: 'white', margin: '3%' }
+  const btnstyle = { backgroundColor: '#FFE600', color: '#1A1A24' }
+  const btnstyle1 = { backgroundColor: '#1A1A24', color: 'white', margin: '1%' }
 
   const handleClickOpen = () => {
     setOpen(true)
   }
+  const navigate = useNavigate()
+
+  const { isLoading, data, error } = useQuery('userdata', () =>
+    axios.get(
+      'users/me',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+      {
+        onSuccess: async data => {
+          if (data.data.roles == 'junior') {
+            console.log(junior)
+          }
+        },
+        onError: async error => {
+          console.log(error)
+          navigate('/login')
+        },
+      },
+    ),
+  )
+
+  const token = localStorage.getItem('thisismynewcourse')
+  useEffect(() => {
+    if (!token) {
+      navigate('/login')
+    }
+  }, [])
+
+  const {
+    isLoading: isLoadingProject,
+    data: dataProject,
+    error: errorProject,
+  } = useQuery('projectsdata', () =>
+    axios.get('projects/all', {
+      onSuccess: async dataProject => {
+        console.log(dataProject)
+      },
+      onError: async errorProject => {
+        console.log(errorProject)
+      },
+    }),
+  )
 
   return (
-    <DrawerPerm>
-      <Box
-        sx={{
-          padding: 1,
-          margin: 1,
-        }}
-      >
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link underline="hover" color="inherit" href="#">
-            MUI
-          </Link>
-          <Link underline="hover" color="inherit" href="#">
-            Core
-          </Link>
-          <Typography color="text.primary">Breadcrumbs</Typography>
-        </Breadcrumbs>
-        <Box>
-          <Grid container>
-            <Grid item sm={4}>
-              <Box display="flex" justifyContent="flex-start">
-                <h1>La liste des projets </h1>
-              </Box>
-            </Grid>
-            <Grid item sm={8}>
-              <Box display="flex" justifyContent="flex-end">
-                <Button
-                  variant="contained"
-                  type="submit"
-                  style={btnstyle}
-                  startIcon={<AddIcon />}
-                  onClick={handleClickOpen}
-                >
-                  Ajouter un client
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
+    <DrawerPerm pagename="Projects List">
+      {dataProject && (
         <Box
           sx={{
-            padding: 2,
-            margin: 2,
-            display: 'flex',
-            flexWrap: 'wrap',
+            padding: 1,
+            margin: 1,
           }}
         >
-          <Card sx={{ maxWidth: 345, borderRadius: '2px' }}>
-            <CardHeader
-              avatar={
-                <Avatar variant="rounded" sx={{ width: 56, height: 56 }}>
-                  N
-                </Avatar>
-              }
-              title="Card Header"
-              subheader={<Chip label="Statut" color="primary" size="small" sx={{ marginTop: '3%' }} />}
-              action={
-                <IconButton>
-                  <MoreVertIcon />
-                </IconButton>
-              }
-            />
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all
-                continents except Antarctica
-              </Typography>
-            </CardContent>
-            <Divider />
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link underline="hover" color="inherit" href="/projects">
+              Projects
+            </Link>
+            <Link underline="hover" color="inherit" href="#"></Link>
+          </Breadcrumbs>
 
-            <CardActions>
-              <Box sx={{ flexGrow: 1 }} />
-              <Button size="small" variant="contained" type="submit" style={btnstyle1}>
-                Voir
-              </Button>
-            </CardActions>
-          </Card>
+          <Box display="flex" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              type="submit"
+              style={btnstyle}
+              startIcon={<AddIcon />}
+              onClick={handleClickOpen}
+            >
+              Ajouter un projet
+            </Button>
+          </Box>
+
+          <Box
+            sx={{
+              padding: 2,
+              margin: 2,
+              display: 'flex',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Grid container>
+              {dataProject.data.map(({ client, status }) => {
+                return (
+                  <Grid
+                    item
+                    component={Card}
+                    xs={3}
+                    sx={{
+                      marginRight: '2%',
+                      marginTop: '2%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      borderRadius: '2px',
+                    }}
+                    key={client._id}
+                  >
+                    <CardHeader
+                      avatar={
+                        <Avatar
+                          variant="rounded"
+                          sx={{ width: 56, height: 56 }}
+                          src={`data:${client};base64, ${Buffer.from(client.avatar.data).toString('base64')}`}
+                        />
+                      }
+                      title={client.name}
+                      subheader={
+                        <Chip
+                          label={status}
+                          color="success"
+                          variant="outlined"
+                          size="small"
+                          sx={{ marginTop: '3%', textTransform: 'uppercase', fontSize: '80%' }}
+                        />
+                      }
+                      action={
+                        <IconButton>
+                          <MoreVertIcon />
+                        </IconButton>
+                      }
+                    />
+                    <CardContent>
+                      <Box style={{ width: 250, whiteSpace: 'nowrap' }}>
+                        <Typography
+                          component="p"
+                          color="text.secondary"
+                          sx={{
+                            width: '100%',
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            fontSize: '0.875rem',
+                            fontWeight: '700',
+                          }}
+                        >
+                          {client.description}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Divider />
+
+                    <CardActions>
+                      <Box sx={{ flexGrow: 1 }} />
+                      <Button size="small" variant="contained" type="submit" style={btnstyle1}>
+                        Voir
+                      </Button>
+                    </CardActions>
+                  </Grid>
+                )
+              })}
+            </Grid>
+          </Box>
         </Box>
-      </Box>
+      )}
     </DrawerPerm>
   )
 }
