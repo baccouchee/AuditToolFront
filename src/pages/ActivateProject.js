@@ -63,7 +63,6 @@ const ActivateProject = () => {
           margin: 1,
         }}
       >
-        {' '}
         <Stepper activeStep={activeStep}>
           {steps.map((label, index) => {
             const stepProps = {}
@@ -108,6 +107,7 @@ const ActivateProject = () => {
           </React.Fragment>
         )}
       </Box>
+      <p>test</p>
     </DrawerPerm>
   )
 }
