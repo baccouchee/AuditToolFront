@@ -9,9 +9,10 @@ import { useQuery } from 'react-query'
 
 const ActivateProject = () => {
   const pull_data = data => {
-    console.log('hahahaha', data) // LOGS DATA FROM CHILD (My name is Dean Winchester... &)
+    setProjectDetailsValue(data) // LOGS DATA FROM CHILD (My name is Dean Winchester... &)
   }
 
+  const [projectDetailsValue, setProjectDetailsValue] = useState('')
   const [activeStep, setActiveStep] = useState(0)
   const token = localStorage.getItem('thisismynewcourse')
   const navigate = useNavigate()
@@ -76,7 +77,11 @@ const ActivateProject = () => {
                     <StepLabel>Creation of the work program</StepLabel>
                   </Step>
                 </Stepper>
-                {activeStep === 0 ? <Firststep getprojectDetails={pull_data} /> : <Secondstep />}
+                {activeStep === 0 ? (
+                  <Firststep getprojectDetails={pull_data} />
+                ) : (
+                  <Secondstep projectDetailsValue={projectDetailsValue} />
+                )}
 
                 <Button disabled={activeStep === 0} onClick={() => previousStep()}>
                   Back
