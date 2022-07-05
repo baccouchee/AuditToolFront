@@ -1,114 +1,94 @@
-import { Box } from '@mui/material'
-import React from 'react'
+import { Box, Step, StepLabel, Stepper, Button, Container, Paper, Typography, CircularProgress } from '@mui/material'
+import React, { useState, useEffect } from 'react'
 import DrawerPerm from '../Components/Drawer/DrawerPerm'
-import Stepper from '@mui/material/Stepper'
-import Step from '@mui/material/Step'
-import StepLabel from '@mui/material/StepLabel'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
-
-const steps = ['Select campaign settings', 'Create an ad group', 'Create an ad']
+import Firststep from '../Components/Stepper/FirstStep'
+import Secondstep from '../Components/Stepper/SecondStep'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { useQuery } from 'react-query'
 
 const ActivateProject = () => {
-  const [activeStep, setActiveStep] = React.useState(0)
-  const [skipped, setSkipped] = React.useState(new Set())
-
-  const isStepOptional = step => {
-    return step === 1
+  const pull_data = data => {
+    console.log('hahahaha', data) // LOGS DATA FROM CHILD (My name is Dean Winchester... &)
   }
 
-  const isStepSkipped = step => {
-    return skipped.has(step)
+  const [activeStep, setActiveStep] = useState(0)
+  const token = localStorage.getItem('thisismynewcourse')
+  const navigate = useNavigate()
+
+  const previousStep = () => {
+    if (activeStep !== 0) setActiveStep(currentStep => currentStep - 1)
+  }
+  const nextStep = () => {
+    if (activeStep < 1) setActiveStep(currentStep => currentStep + 1)
   }
 
-  const handleNext = () => {
-    let newSkipped = skipped
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values())
-      newSkipped.delete(activeStep)
+  const { isLoading, data, error } = useQuery('userdata', () =>
+    axios.get(
+      'users/me',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+      {
+        onSuccess: async data => {
+          if (data.data.roles == 'junior') {
+            console.log(junior)
+          }
+        },
+        onError: async error => {
+          console.log(error)
+          navigate('/login')
+        },
+      },
+    ),
+  )
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/login')
     }
+  }, [])
 
-    setActiveStep(prevActiveStep => prevActiveStep + 1)
-    setSkipped(newSkipped)
-  }
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1)
-  }
-
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.")
-    }
-
-    setActiveStep(prevActiveStep => prevActiveStep + 1)
-    setSkipped(prevSkipped => {
-      const newSkipped = new Set(prevSkipped.values())
-      newSkipped.add(activeStep)
-      return newSkipped
-    })
-  }
-
-  const handleReset = () => {
-    setActiveStep(0)
+  if (data && data.data.roles == 'junior') {
+    navigate('/projects')
   }
 
   return (
-    <DrawerPerm pagename="Activate your project">
-      <Box
-        sx={{
-          padding: 1,
-          margin: 1,
-        }}
-      >
-        <Stepper activeStep={activeStep}>
-          {steps.map((label, index) => {
-            const stepProps = {}
-            const labelProps = {}
-            if (isStepOptional(index)) {
-              labelProps.optional = <Typography variant="caption">Optional</Typography>
-            }
-            if (isStepSkipped(index)) {
-              stepProps.completed = false
-            }
-            return (
-              <Step key={label} {...stepProps}>
-                <StepLabel {...labelProps}>{label}</StepLabel>
-              </Step>
-            )
-          })}
-        </Stepper>
-        {activeStep === steps.length ? (
-          <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1 }}>All steps completed - you&apos;re finished</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Box sx={{ flex: '1 1 auto' }} />
-              <Button onClick={handleReset}>Reset</Button>
-            </Box>
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
-                Back
-              </Button>
-              <Box sx={{ flex: '1 1 auto' }} />
-              {isStepOptional(activeStep) && (
-                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                  Skip
-                </Button>
-              )}
+    <div>
+      {isLoading && <CircularProgress />}
+      {data && data.data.roles == 'senior' && (
+        <DrawerPerm pagename="Activate your project">
+          <Box
+            sx={{
+              padding: 1,
+              margin: 1,
+            }}
+          >
+            <Container component="main" maxWidth="xl" sx={{ mb: 4 }}>
+              <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+                <Stepper activeStep={activeStep}>
+                  <Step>
+                    <StepLabel>Project approval</StepLabel>
+                  </Step>
+                  <Step>
+                    <StepLabel>Creation of the work program</StepLabel>
+                  </Step>
+                </Stepper>
+                {activeStep === 0 ? <Firststep getprojectDetails={pull_data} /> : <Secondstep />}
 
-              <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Finish' : 'Next'}</Button>
-            </Box>
-          </React.Fragment>
-        )}
-      </Box>
-      <p>test</p>
-    </DrawerPerm>
+                <Button disabled={activeStep === 0} onClick={() => previousStep()}>
+                  Back
+                </Button>
+                {activeStep < 1 && <Button onClick={() => nextStep()}>Next</Button>}
+                {activeStep === 1 && <Button>Validate</Button>}
+              </Paper>
+            </Container>
+          </Box>
+        </DrawerPerm>
+      )}
+    </div>
   )
 }
 

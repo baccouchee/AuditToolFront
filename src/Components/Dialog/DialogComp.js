@@ -125,15 +125,6 @@ const DialogComp = ({ open, handleClose }) => {
       </DialogTitle>
 
       <DialogContent dividers>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            maxWidth: 300,
-            borderRadius: 1,
-          }}
-        ></Box>
-
         <Grid container sx={{ '& .MuiTextField-root': { m: 1, width: '85%' } }}>
           <Grid item xs={6}>
             <TextField
