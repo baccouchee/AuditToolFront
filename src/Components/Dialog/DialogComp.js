@@ -14,7 +14,7 @@ import axios from 'axios'
 import validator from 'validator'
 
 const DialogComp = ({ open, handleClose }) => {
-  const btnstyle = { margin: '2%', backgroundColor: '#FFE600', color: '#1A1A24' }
+  const btnstyle = { backgroundColor: '#FFE600', color: '#1A1A24' }
   const queryKey = ['clientsAdd']
 
   const [avatar, setAvatar] = useState('')

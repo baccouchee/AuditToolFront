@@ -2,52 +2,50 @@ import { Box, Grid, TextField, Typography, FormControl, InputLabel, Select, Menu
 import { DesktopDatePicker } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import { useQuery } from 'react-query'
 import axios from 'axios'
 
-const Secondstep = projectDetailsValue => {
+const Secondstep = props => {
   const handleChangeForm = e => {
     const { name, value } = e.target
     setFormValues({ ...formValues, [name]: value })
-    // On autofill we get a stringified value.
   }
 
-  const names = ['Oliver Hansen', 'Van Henry', 'April Tucker', 'Ralph Hubbard']
+  const findChipName = (data, id) => {
+    const test = data.find(e => e._id === id)
+    return test.name
+  }
 
-  const [senior, setSenior] = useState([])
-  const [junior, setJunior] = useState([])
+  const [deadline, setdeadline] = useState(new Date(moment().format('DD-MM-YYYY hh:mm:ss')))
 
-  const [dateValue, setDateValue] = useState(new Date(moment().format('DD-MM-YYYY hh:mm:ss')))
+  const workProgramValues = { name: '', description: '', junior: [], priority: '', senior: [], deadline }
+  const [formValues, setFormValues] = useState(workProgramValues)
+
+  useEffect(() => {
+    props.getWorkProgram(formValues)
+  }, [formValues])
+
+  const handleChange = deadline => {
+    setdeadline(deadline)
+  }
 
   const handleChangeSetSenior = event => {
     const {
       target: { value },
     } = event
-    setSenior(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    )
+    setFormValues({ ...formValues, senior: typeof value === 'string' ? value.split(',') : value })
+    console.log(value)
+    findChipName(data?.data, value[0])
   }
 
   const handleChangeSetJunior = event => {
     const {
       target: { value },
     } = event
-    setJunior(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    )
-  }
-
-  const workProgramValues = { name: '', description: '', junior, priority: '', senior, dateValue }
-  const [formValues, setFormValues] = useState(workProgramValues)
-
-  console.log(projectDetailsValue)
-  const handleChange = dateValue => {
-    setDateValue(dateValue)
+    setFormValues({ ...formValues, junior: typeof value === 'string' ? value.split(',') : value })
   }
 
   const { data } = useQuery('seniorusers', () =>
@@ -76,6 +74,7 @@ const Secondstep = projectDetailsValue => {
     }),
   )
 
+  console.log(formValues)
   return (
     <>
       {data && datajunior && (
@@ -107,13 +106,13 @@ const Secondstep = projectDetailsValue => {
                   id="senior"
                   label="Senior auditeur"
                   multiple
-                  value={senior}
+                  value={formValues.senior}
                   onChange={handleChangeSetSenior}
                   input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                   renderValue={selected => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map(name => (
-                        <Chip key={name} label={name} />
+                      {selected.map(value => (
+                        <Chip key={value} label={findChipName(data?.data, value)} />
                       ))}
                     </Box>
                   )}
@@ -134,13 +133,13 @@ const Secondstep = projectDetailsValue => {
                   id="sejuniornior"
                   label="Junior auditeur"
                   multiple
-                  value={junior}
+                  value={formValues.junior}
                   onChange={handleChangeSetJunior}
                   input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                   renderValue={selected => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map(value => (
-                        <Chip key={value} label={value} />
+                        <Chip key={value} label={findChipName(datajunior?.data, value)} />
                       ))}
                     </Box>
                   )}
@@ -177,7 +176,7 @@ const Secondstep = projectDetailsValue => {
                     <DesktopDatePicker
                       label="Deadline"
                       onChange={handleChange}
-                      value={dateValue}
+                      value={deadline}
                       inputFormat="MM/dd/yyyy"
                       name="deadline"
                       renderInput={params => <TextField {...params} />}

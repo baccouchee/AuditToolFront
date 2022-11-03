@@ -14,7 +14,7 @@ import axios from 'axios'
 import { Buffer } from 'buffer'
 
 const DialogEdit = ({ open, handleClose, rowId }) => {
-  const btnstyle = { margin: '2%', backgroundColor: '#FFE600', color: '#1A1A24' }
+  const btnstyle = { backgroundColor: '#FFE600', color: '#1A1A24' }
 
   const [priority, setpriority] = useState('')
   const [name, setname] = useState('')

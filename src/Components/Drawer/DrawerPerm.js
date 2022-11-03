@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Badge from '@mui/material/Badge'
-import { Avatar, Button, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material'
+import { Avatar, Button, Grid, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import NotificationsIcon from '@mui/icons-material/Notifications'
@@ -268,8 +268,6 @@ const DrawerPerm = ({ children, pagename }) => {
               overflow: 'auto',
             }}
           >
-            <Toolbar />
-
             {children}
           </Box>
         </Box>

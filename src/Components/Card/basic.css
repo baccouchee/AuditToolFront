@@ -1,0 +1,14 @@
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  width: 20px;
+  height: 20px;
+}
+.mostly-customized-scrollbar::-webkit-scrollbar-track {
+  background: none;
+}
+/* Add a thumb */
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: #1d388f61;
+  border-radius: 999px;
+  background-clip: padding-box;
+  border: 3px #efefef solid;
+}

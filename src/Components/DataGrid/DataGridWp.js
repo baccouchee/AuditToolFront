@@ -15,12 +15,13 @@ import SearchIcon from '@mui/icons-material/Search'
 import { DataGrid } from '@mui/x-data-grid'
 import PropTypes from 'prop-types'
 import { grey } from '@mui/material/colors'
-import DialogEdit from '../Dialog/DialogEdit'
+import DialogEditWP from '../Dialog/DialogEditWP'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const styles = {
   inputBase: {
@@ -72,14 +73,14 @@ function QuickSearchToolbar(props) {
         />
         <Box sx={{ flexGrow: 1 }} />
         <Typography level="h1" fontWeight="bold" py={1} px={1} display="inline-flex">
-          Dashboard Clients
+          Dashboard Workprograms
         </Typography>
       </Box>
     </div>
   )
 }
 
-export default function DataGridDemo() {
+export default function DataGridWP() {
   const [openDialog, setOpenDialog] = React.useState(false)
   const [idClient, setIdClient] = React.useState('')
 
@@ -89,6 +90,12 @@ export default function DataGridDemo() {
       setIdClient(cellValue)
       console.log(cellValue)
     }
+  }
+
+  const navigate = useNavigate()
+
+  const handleOnCellClick = params => {
+    navigate(`/projects/workprogram/rcm/${params.id}`)
   }
 
   const handleCloseDialog = () => {
@@ -109,14 +116,18 @@ export default function DataGridDemo() {
     {
       field: 'name',
       headerClassName: 'headertheme',
-      headerName: 'Client name',
+      headerName: 'WorkProgram name',
       editable: false,
       width: 250,
       renderCell: params => {
         return (
           <>
-            <Avatar src={`data:${params.row};base64, ${Buffer.from(params.row.avatar.data).toString('base64')}`} />
-            <Grid container direction="column" item xs={12}>
+            <Avatar
+              src={`data:${params.row.project.client};base64, ${Buffer.from(
+                params.row.project.client.avatar.data,
+              ).toString('base64')}`}
+            />
+            <Grid container direction="column" item xs={6}>
               <Grid item xs style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <Typography
                   style={{
@@ -124,6 +135,16 @@ export default function DataGridDemo() {
                     width: '100%',
                     marginLeft: '10%',
                     textAlign: 'left',
+                  }}
+                >
+                  {params.row.project.client.name} -
+                </Typography>
+                <Typography
+                  style={{
+                    fontWeight: 500,
+                    width: '100%',
+                    textAlign: 'left',
+                    marginLeft: '2%',
                   }}
                 >
                   {params.row.name}
@@ -149,11 +170,44 @@ export default function DataGridDemo() {
       },
     },
     {
-      field: 'email',
-      headerName: 'Email',
+      field: 'senior',
+      headerName: 'Senior auditor',
       headerClassName: 'headertheme',
       width: 200,
       editable: false,
+      renderCell: params => {
+        return (
+          <>
+            {params.row.senior.map(function (item, i) {
+              return (
+                <Box sx={{ marginRight: '5%' }}>
+                  <Chip label={params.row.senior[i].name} />
+                </Box>
+              )
+            })}
+          </>
+        )
+      },
+    },
+    {
+      field: 'junior',
+      headerName: 'Junior auditor',
+      headerClassName: 'headertheme',
+      width: 200,
+      editable: false,
+      renderCell: params => {
+        return (
+          <>
+            {params.row.junior.map(function (item, i) {
+              return (
+                <Box sx={{ marginRight: '5%' }}>
+                  <Chip label={params.row.junior[i].name} />
+                </Box>
+              )
+            })}
+          </>
+        )
+      },
     },
     {
       field: 'description',
@@ -163,8 +217,8 @@ export default function DataGridDemo() {
       editable: false,
     },
     {
-      field: 'date',
-      headerName: 'Date',
+      field: 'createdAt',
+      headerName: 'Date of creation',
       headerClassName: 'headertheme',
       type: 'date',
       width: 160,
@@ -173,6 +227,18 @@ export default function DataGridDemo() {
         return <p>{moment(CellValue.value).format('DD/MM/YYYY')}</p>
       },
     },
+    {
+      field: 'deadline',
+      headerName: 'Deadline',
+      headerClassName: 'headertheme',
+      type: 'date',
+      width: 160,
+      editable: false,
+      renderCell: CellValue => {
+        return <p>{moment(CellValue.value).format('DD/MM/YYYY')}</p>
+      },
+    },
+
     {
       field: 'priority',
       headerClassName: 'headertheme',
@@ -201,12 +267,13 @@ export default function DataGridDemo() {
           }}
         />,
         <GridActionsCellItem icon={<EditIcon />} onClick={() => handleClickOpen(params.id)} label="Edit" showInMenu />,
+        <GridActionsCellItem icon={<EditIcon />} onClick={() => handleOnCellClick(params)} label="Open" showInMenu />,
       ],
     },
   ]
-
-  const { isLoading, data, error, isFetched, refetch } = useQuery('clientsdata', () =>
-    axios.get('clients/all', {
+  const { id } = useParams()
+  const { isLoading, data, refetch } = useQuery('workprogramdata', () =>
+    axios.get(`workprograms/${id}`, {
       onSuccess: async data => {
         console.log(data)
       },
@@ -220,13 +287,13 @@ export default function DataGridDemo() {
 
   const { data: data1, mutate } = useMutation(
     async cellValue => {
-      const resp = axios.delete(`Clients/${cellValue}`)
+      const resp = axios.delete(`workprograms/${cellValue}`)
       return resp.data1
     },
     {
       onSuccess: () => {
         setTimeout(() => {
-          queryClient.invalidateQueries('clientsdata'), refetch()
+          queryClient.invalidateQueries('workprogramdata'), refetch()
         }, 500)
       },
       onError: async error => {
@@ -276,11 +343,11 @@ export default function DataGridDemo() {
     <div>
       {isLoading && <p>wait</p>}
       {data && (
-        <div style={{ height: '68vh', width: '100%', backgroundColor: 'white' }}>
+        <div style={{ height: '68.2vh', width: '100%', backgroundColor: 'white' }}>
           <Dialog open={openDialog} onClose={handleCloseDialog} aria-describedby="alert-dialog-description">
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Do you really want to delete this client ?
+                Do you really want to delete this work program ?
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -290,7 +357,8 @@ export default function DataGridDemo() {
               </Button>
             </DialogActions>
           </Dialog>
-          <DialogEdit open={open} rowId={rowId} handleClose={handleClose} />
+          <DialogEditWP open={open} rowId={rowId} handleClose={handleClose} />
+
           <DataGrid
             sx={{
               '& .MuiDataGrid-columnHeader:last-child .MuiDataGrid-columnSeparator': {
@@ -300,7 +368,7 @@ export default function DataGridDemo() {
             rows={rows}
             columns={columns}
             getRowId={dataRow => dataRow._id}
-            pageSize={9}
+            pageSize={6}
             getRowClassName={params => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd')}
             rowsPerPageOptions={[6]}
             components={{ Toolbar: QuickSearchToolbar }}

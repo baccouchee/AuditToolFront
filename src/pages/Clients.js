@@ -1,4 +1,15 @@
-import { Button, Grid, Box, InputLabel, FormControl, Breadcrumbs, Typography, Link, IconButton } from '@mui/material'
+import {
+  Button,
+  Grid,
+  Box,
+  InputLabel,
+  FormControl,
+  Breadcrumbs,
+  Typography,
+  Link,
+  IconButton,
+  Toolbar,
+} from '@mui/material'
 import React, { useState, Component, useEffect } from 'react'
 import DataGridDemo from '../Components/DataGrid/DataGrid'
 import AddIcon from '@mui/icons-material/Add'
@@ -16,14 +27,13 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from 'react-query'
 import DialogComp from '../Components/Dialog/DialogComp'
+import StatClient from '../Components/Charts/statClient'
 
 const Client = () => {
   const btnstyle = { backgroundColor: '#FFE600', color: '#1A1A24' }
   const token = localStorage.getItem('thisismynewcourse')
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
-
-
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -70,6 +80,7 @@ const Client = () => {
       {isLoading && <CircularProgress />}
       {data && data.data.roles == 'senior' && (
         <DrawerPerm pagename="Client Dashboard">
+          <Toolbar />
           <Box
             sx={{
               padding: 1,

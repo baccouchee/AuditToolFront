@@ -2,26 +2,38 @@ import { Box, Grid, TextField, Typography, FormControl, InputLabel, Select, Menu
 import { DesktopDatePicker } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import { useQuery } from 'react-query'
 import axios from 'axios'
 
-const Firststep = props => {
+const Firststep = (props, formErrors, isSubmit) => {
   const handleChangeForm = e => {
     const { name, value } = e.target
     setFormValues({ ...formValues, [name]: value })
   }
 
-  const [dateValue, setDateValue] = useState(new Date(moment().format('DD-MM-YYYY hh:mm:ss')))
-  const initialValues = { manager: '', description: '', dateValue }
+  const [deadline, setdeadline] = useState(new Date(moment().format('DD-MM-YYYY hh:mm:ss')))
+  const initialValues = { manager: '', description: '', deadline }
   const [formValues, setFormValues] = useState(initialValues)
+  const [fistStepFormErrors, setFistStepFormErrors] = useState(formErrors)
 
-  const handleChange = dateValue => {
-    setDateValue(dateValue)
+  const handleChange = deadline => {
+    setdeadline(deadline)
   }
 
-  props.getprojectDetails(formValues)
+  useEffect(() => {
+    if (isSubmit) {
+      console.log('is Submit')
+    }
+    console.log(formErrors)
+  }, [isSubmit, formErrors])
+
+  useEffect(() => {
+    props.getprojectDetails(formValues)
+    setFistStepFormErrors(formErrors)
+    console.log(isSubmit)
+  }, [formValues, formErrors])
 
   const { isLoading, data, error } = useQuery('managerusers', () =>
     axios.get('users/manager', {
@@ -33,7 +45,7 @@ const Firststep = props => {
       },
     }),
   )
-
+  console.log(formErrors)
   return (
     <>
       {data && (
@@ -72,8 +84,10 @@ const Firststep = props => {
                   <FormControl required fullWidth>
                     <DesktopDatePicker
                       label="Deadline"
+                      error={formErrors.deadline?.length > 0}
+                      helperText={formErrors.deadline}
                       onChange={handleChange}
-                      value={dateValue}
+                      value={deadline}
                       inputFormat="MM/dd/yyyy"
                       name="deadline"
                       renderInput={params => <TextField {...params} />}
@@ -90,6 +104,8 @@ const Firststep = props => {
                 type="text"
                 name="description"
                 variant="outlined"
+                error={formErrors.description}
+                helperText={formErrors.description}
                 onChange={handleChangeForm}
                 value={formValues.description}
                 multiline

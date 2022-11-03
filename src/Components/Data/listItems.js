@@ -4,7 +4,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import PersonIcon from '@mui/icons-material/Person'
 import BallotIcon from '@mui/icons-material/Ballot'
-import ChatIcon from '@mui/icons-material/Chat'
+import HomeIcon from '@mui/icons-material/Home'
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter'
 import SettingsIcon from '@mui/icons-material/Settings'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -12,6 +12,12 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 
 export const mainListItems = (
   <React.Fragment>
+    <ListItemButton component={Link} to="/home">
+      <ListItemIcon sx={{ color: '#FFFFFF' }}>
+        <HomeIcon />
+      </ListItemIcon>
+      <ListItemText primary="Home" />
+    </ListItemButton>
     <ListItemButton component={Link} to="/clients">
       <ListItemIcon sx={{ color: '#FFFFFF' }}>
         <PersonIcon />
@@ -31,12 +37,6 @@ export const mainListItems = (
         <BallotIcon />
       </ListItemIcon>
       <ListItemText primary="Work programs" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon sx={{ color: '#FFFFFF' }}>
-        <ChatIcon />
-      </ListItemIcon>
-      <ListItemText primary="Chat" />
     </ListItemButton>
   </React.Fragment>
 )

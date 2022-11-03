@@ -2,3 +2,32 @@
   font-family: 'Roboto', sans-serif;
   color: white;
 }
+
+.flex-section {
+  height: 100%;
+  position: fixed;
+  max-height: 100%;
+  overflow-y: hidden;
+}
+
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 2px;
+}
+.mostly-customized-scrollbar::-webkit-scrollbar-track {
+  background: none;
+}
+/* Add a thumb */
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: #1d388f61;
+  border-radius: 999px;
+  background-clip: padding-box;
+  border: 3px #efefef solid;
+}
+
+table {
+  border-collapse: collapse;
+}
+td, th /* Mettre une bordure sur les td ET les th */ {
+  border: 1px solid black;
+}
