@@ -120,11 +120,7 @@ export default function DataGridDemo() {
                     textAlign: 'left',
                   }}
                 >
-                  {'Updated ' +
-                    moment(params.row.updatedAt, 'YYYYMMDD')
-                      .hour(+3)
-                      .minute(+9)
-                      .fromNow()}
+                  {'Updated ' + moment(params.row.updatedAt, 'YYYY-MM-DD HH:mm:ss').fromNow()}
                 </Typography>
               </Grid>
             </Grid>
@@ -136,7 +132,6 @@ export default function DataGridDemo() {
       field: 'email',
       headerName: 'Email',
       headerClassName: 'headertheme',
-      type: 'email',
       width: 200,
       editable: false,
     },
@@ -144,7 +139,6 @@ export default function DataGridDemo() {
       field: 'description',
       headerClassName: 'headertheme',
       headerName: 'Description',
-
       width: 400,
       editable: false,
     },
@@ -163,7 +157,6 @@ export default function DataGridDemo() {
       field: 'priority',
       headerClassName: 'headertheme',
       headerName: 'Status',
-
       type: 'date',
       width: 160,
       editable: false,

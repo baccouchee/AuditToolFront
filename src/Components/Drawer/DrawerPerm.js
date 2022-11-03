@@ -105,8 +105,6 @@ const DrawerPerm = ({ children, pagename }) => {
   React.useEffect(() => {
     if (!token) {
       navigate('/login')
-    } else {
-      console.log(`Bearer ${token}`)
     }
   }, [])
 

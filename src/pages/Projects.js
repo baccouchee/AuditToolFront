@@ -76,6 +76,18 @@ const Projects = () => {
     }),
   )
 
+  const Navigate = status => {
+    if (status === 'Created') {
+      navigate('/activate')
+    }
+    if (status === 'In progress') {
+      navigate('/workprogram')
+    }
+    if (status === 'Closed') {
+      navigate('/workprogram')
+    }
+  }
+
   return (
     <DrawerPerm pagename="Projects List">
       {dataProject && (
@@ -139,13 +151,31 @@ const Projects = () => {
                       }
                       title={client.name}
                       subheader={
-                        <Chip
-                          label={status}
-                          color="success"
-                          variant="outlined"
-                          size="small"
-                          sx={{ marginTop: '3%', textTransform: 'uppercase', fontSize: '80%' }}
-                        />
+                        status === 'In progress' ? (
+                          <Chip
+                            variant="outlined"
+                            size="small"
+                            sx={{ marginTop: '3%', textTransform: 'uppercase', fontSize: '80%' }}
+                            label={status}
+                            color="warning"
+                          />
+                        ) : status === 'Created' ? (
+                          <Chip
+                            label={status}
+                            variant="outlined"
+                            size="small"
+                            sx={{ marginTop: '3%', textTransform: 'uppercase', fontSize: '80%' }}
+                            color="success"
+                          />
+                        ) : (
+                          <Chip
+                            label={status}
+                            variant="outlined"
+                            size="small"
+                            sx={{ marginTop: '3%', textTransform: 'uppercase', fontSize: '80%' }}
+                            color="error"
+                          />
+                        )
                       }
                       action={
                         <IconButton>
@@ -175,8 +205,14 @@ const Projects = () => {
 
                     <CardActions>
                       <Box sx={{ flexGrow: 1 }} />
-                      <Button size="small" variant="contained" type="submit" style={btnstyle1}>
-                        Voir
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={() => Navigate(status)}
+                        type="submit"
+                        style={btnstyle1}
+                      >
+                        Show
                       </Button>
                     </CardActions>
                   </Grid>
