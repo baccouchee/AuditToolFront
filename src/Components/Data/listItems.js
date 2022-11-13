@@ -31,13 +31,6 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Projects" />
     </ListItemButton>
-
-    <ListItemButton>
-      <ListItemIcon sx={{ color: '#FFFFFF' }}>
-        <BallotIcon />
-      </ListItemIcon>
-      <ListItemText primary="Work programs" />
-    </ListItemButton>
   </React.Fragment>
 )
 

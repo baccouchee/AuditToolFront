@@ -28,7 +28,7 @@ const ProjectCardInProgress = () => {
     setOpen(true)
   }
 
-  const handleClose = () => {
+  const handleClose = f => {
     setOpen(false)
   }
 

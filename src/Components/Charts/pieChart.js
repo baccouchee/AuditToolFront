@@ -33,13 +33,12 @@ const PieChart = () => {
     if (data) {
       data.map(val => {
         if (val.numberofdocuments) {
+          console.log('val', val.numberofdocuments)
           numberOfDoc.push(val.numberofdocuments)
           priority.push(val._id)
         }
       })
     }
-
-    console.log(numberOfDoc)
 
     console.log(priority)
   }

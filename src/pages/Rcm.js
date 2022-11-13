@@ -16,8 +16,11 @@ import axios from 'axios'
 import * as XLSX from 'xlsx/xlsx.mjs'
 import { ShutterSpeedOutlined } from '@mui/icons-material'
 import TableToExcel from '@linways/table-to-excel'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const Rcm = () => {
+  const { workprogram } = useParams()
+  console.log(workprogram)
   const [open, setOpen] = React.useState(false)
   const [clickedRisk, setClickedRisk] = React.useState('')
   const [clickedControl, setclickedControl] = React.useState('')
@@ -66,7 +69,9 @@ const Rcm = () => {
 
   const saveOmar = () => {
     const results = []
+
     if (subStream.length > 0) {
+      console.log('substream')
       subStream.forEach(subStream => {
         const subStreamResult = {
           _id: subStream._id,
@@ -102,9 +107,11 @@ const Rcm = () => {
   }
 
   const handleClickExport = () => {
-    axios.get('subStream/62ff86ab0de29330bc35b1b0').then(res => {
+    axios.get(`subStream/${workprogram}`).then(res => {
       setSubStream(res.data)
+      console.log(res.data)
     })
+
     saveOmar()
     setLoadData(true)
   }
@@ -151,8 +158,8 @@ const Rcm = () => {
                         <>
                           <tr>
                             <td rowSpan={r.controls.length}>{r.name}</td>
-                            <td> {r.controls[0].control}</td>
-                            <td> {r.controls[0].testPro}</td>
+                            <td> {r.controls[0]?.control}</td>
+                            <td> {r.controls[0]?.testPro}</td>
                           </tr>
                           {r.controls.map((c, index) => {
                             return (
