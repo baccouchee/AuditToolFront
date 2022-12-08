@@ -1,74 +1,45 @@
 import { height } from '@mui/system'
 import React, { useState, useEffect } from 'react'
-import { Pie } from 'react-chartjs-2'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { useQuery } from 'react-query'
 import axios from 'axios'
+import { CategoryScale, ArcElement, Tooltip, Legend } from 'chart.js'
+import { Line, Pie, Bar } from 'react-chartjs-2'
+import Chart from 'chart.js/auto'
 
-ChartJS.register(ArcElement, Tooltip, Legend)
+Chart.register(ArcElement, Tooltip, Legend, CategoryScale)
 
 const PieChart = () => {
-  const [chartData, setChartData] = useState({ datasets: [] })
+  const [chartData, setChartData] = useState([{ datasets: [] }])
+  const { isLoading, data, error } = useQuery('pieChartData', () => axios.get('projects/all'), {
+    onSuccess: () => {
+      setChartData(data?.data)
+    },
+    onError: async error => {
+      console.log(error)
+    },
+    refetchOnWindowFocus: false,
+  })
 
-  const [numberOfDoc, setNumberOfDoc] = useState([])
-  const [priority, setPriority] = useState([])
+  //get unique status from data
+  const uniqueStatus = [...new Set(data?.data.map(item => item.status))]
+  //get unique status count from data
+  const uniqueStatusCount = uniqueStatus.map(status => {
+    return data?.data.filter(item => item.status === status).length
+  })
 
-  const { isLoading, data, error } = useQuery(
-    'pieChartData',
-    () =>
-      axios.get('workprograms/priority/charts', {
-        onSuccess: () => {
-          console.log(data)
-        },
-        onError: async error => {
-          console.log(error)
-        },
-      }),
-    { refetchOnWindowFocus: false },
-  )
-
-  const val = data => {
-    setNumberOfDoc([])
-    setPriority([])
-    if (data) {
-      data.map(val => {
-        if (val.numberofdocuments) {
-          console.log('val', val.numberofdocuments)
-          numberOfDoc.push(val.numberofdocuments)
-          priority.push(val._id)
-        }
-      })
-    }
-
-    console.log(priority)
+  let datas = {
+    labels: uniqueStatus || [],
+    datasets: [
+      {
+        label: 'My First Dataset',
+        data: uniqueStatusCount,
+        backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)'],
+        hoverOffset: 4,
+      },
+    ],
   }
 
-  useEffect(() => {
-    if (data) {
-      val(data?.data)
-    }
-  }, [data])
-
-  useEffect(() => {
-    setChartData({
-      labels: priority,
-      datasets: [
-        {
-          label: '# of Votes',
-          data: numberOfDoc,
-          backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(255, 206, 86, 0.2)'],
-          borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 206, 86, 1)'],
-          borderWidth: 1,
-          tension: 0.1,
-        },
-      ],
-    })
-  }, [data])
-  return (
-    <div>
-      <Pie data={chartData} />
-    </div>
-  )
+  return <Pie data={datas} />
 }
 
 export default PieChart

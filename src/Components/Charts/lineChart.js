@@ -28,7 +28,7 @@ const LineChart = () => {
     () =>
       axios.get('projects/month', {
         onSuccess: () => {
-          console.log(data)
+          console.log('test', data)
         },
         onError: async error => {
           console.log(error)
@@ -48,10 +48,6 @@ const LineChart = () => {
         }
       })
     }
-
-    console.log(numberOfDoc)
-
-    console.log(month)
   }
 
   useEffect(() => {
