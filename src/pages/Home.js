@@ -12,6 +12,8 @@ import HomeTab from './HomeTab'
 
 const Home = () => {
   const [selectedTab, setSelectedTab] = React.useState('Overview')
+  const tab = ['clients', 'projects', 'workprogram']
+
   return (
     <DrawerPerm pagename="Client Dashboard">
       <Toolbar />
@@ -60,11 +62,9 @@ const Home = () => {
           </div>
         )}
         <div className="w-1/5 flex-col h-screen mr-2">
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
+          {tab.map((item, index) => {
+            return <Card key={index} tab={tab[index]} />
+          })}
         </div>
       </div>
     </DrawerPerm>
