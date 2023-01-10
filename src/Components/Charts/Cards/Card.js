@@ -10,7 +10,7 @@ const Card = tab => {
 
   React.useEffect(() => {
     if (tab) {
-      console.log(tab)
+      console.log('tab', tab)
       axios
         .get(`${tab.tab}/documents`)
         .then(function (response) {

@@ -60,10 +60,12 @@ const Home = () => {
                 </div>
                 <div className="flex flex-col justify-around lg:flex-row">
                   <div className="w-1/4 md:w-1/3">
-                    <PriorityCharts />
+                    <p className=" w-full text-lg mt-4 ">Clients by priority</p>
+
+                    <StatClient />
                   </div>
                   <div className="w-1/4 md:w-1/3">
-                    <PriorityCharts />
+                    <LineChart />
                   </div>
                 </div>
               </div>

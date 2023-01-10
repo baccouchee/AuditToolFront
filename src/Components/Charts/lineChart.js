@@ -1,6 +1,6 @@
 import { height } from '@mui/system'
 import React, { useState, useEffect } from 'react'
-import { Line } from 'react-chartjs-2'
+import { Line, Bar } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,72 +16,49 @@ import axios from 'axios'
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const LineChart = () => {
-  const [chartData, setChartData] = useState({ datasets: [] })
+  const [chartData, setChartData] = useState([])
 
-  const [chartOptions, setChartOptions] = useState({})
+  const { isLoading, data, error, isFetched, refetch } = useQuery('workprograms', () => axios.get('workprograms/all'), {
+    onSuccess: () => {
+      setChartData(data?.data)
+    },
+  })
 
-  const [numberOfDoc, setNumberOfDoc] = useState([])
-  const [month, setMonth] = useState([])
+  console.log('chartData', chartData)
 
-  const { isLoading, data, error } = useQuery(
-    'lineChartData',
-    () =>
-      axios.get('projects/month', {
-        onSuccess: () => {
-          console.log('test', data)
-        },
-        onError: async error => {
-          console.log(error)
-        },
-      }),
-    { refetchOnWindowFocus: false },
-  )
+  const uniqueStatus = [...new Set(data?.data.map(item => item.priority))]
+  //get unique status count from data
+  const uniqueStatusCount = uniqueStatus.map(priority => {
+    return data?.data.filter(item => item.priority === priority).length
+  })
 
-  const val = data => {
-    setNumberOfDoc([])
-    setMonth([])
-    if (data) {
-      data.map(val => {
-        if (val.numberofdocuments) {
-          numberOfDoc.push(val.numberofdocuments)
-          month.push(val.month)
-        }
-      })
-    }
+  let datas = {
+    labels: uniqueStatus ? uniqueStatus : [],
+    datasets: [
+      {
+        label: 'Workprograms',
+        data: uniqueStatusCount ? uniqueStatusCount : [],
+        backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)'],
+        hoverOffset: 4,
+      },
+    ],
   }
 
-  useEffect(() => {
-    if (data) {
-      val(data?.data)
-    }
-  }, [data])
-
-  useEffect(() => {
-    setChartData({
-      labels: month,
-      datasets: [
-        {
-          label: 'Number of projects by date',
-          data: numberOfDoc,
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1,
-        },
-      ],
-    })
-    setChartOptions({
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'top',
-        },
-        title: { display: true, text: 'yes' },
-      },
-    })
-  }, [data])
   return (
     <div>
-      <Line options={chartOptions} data={chartData} />
+      <Bar
+        data={datas}
+        height={400}
+        width={600}
+        options={{
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        }}
+      />
     </div>
   )
 }
