@@ -10,14 +10,19 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 
+let user = {
+  role: 'manager',
+}
 export const mainListItems = (
   <React.Fragment>
-    <ListItemButton component={Link} to="/home">
-      <ListItemIcon sx={{ color: '#FFFFFF' }}>
-        <HomeIcon />
-      </ListItemIcon>
-      <ListItemText primary="Home" />
-    </ListItemButton>
+    {user.role === 'manager' && (
+      <ListItemButton component={Link} to="/home">
+        <ListItemIcon sx={{ color: '#FFFFFF' }}>
+          <HomeIcon />
+        </ListItemIcon>
+        <ListItemText primary="Home" />
+      </ListItemButton>
+    )}
     <ListItemButton component={Link} to="/clients">
       <ListItemIcon sx={{ color: '#FFFFFF' }}>
         <PersonIcon />
